@@ -57,8 +57,10 @@ const struct ButtonConfig configs[] = {
   },
   {
     .title = @"Lifted",
-    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* __,
-                       UIPointerShape* proposedShape) {
+    .block = ^UIPointerStyle*(
+        UIButton* button,
+        __unused UIPointerEffect* proposedEffect,
+        UIPointerShape* proposedShape) {
       UITargetedPreview* preview =
           [[UITargetedPreview alloc] initWithView:button];
       UIPointerLiftEffect* effect =
@@ -68,8 +70,10 @@ const struct ButtonConfig configs[] = {
   },
   {
     .title = @"Star Shaped",
-    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* proposedEffect,
-                         UIPointerShape* __) {
+    .block = ^UIPointerStyle*(
+        UIButton* button,
+        UIPointerEffect* proposedEffect,
+        __unused UIPointerShape* proposedShape) {
       CGRect rect = button.frame;
       return [UIPointerStyle
           styleWithEffect:proposedEffect
@@ -78,8 +82,10 @@ const struct ButtonConfig configs[] = {
   },
   {
     .title = @"Hover",
-    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* proposedEffect,
-                       UIPointerShape* proposedShape) {
+    .block = ^UIPointerStyle*(
+        UIButton* button,
+        __unused UIPointerEffect* proposedEffect,
+        __unused UIPointerShape* proposedShape) {
       UITargetedPreview* preview =
           [[UITargetedPreview alloc] initWithView:button];
       UIPointerHoverEffect* effect =
@@ -91,8 +97,10 @@ const struct ButtonConfig configs[] = {
   },
   {
     .title = @"Funky Hover",
-    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* __,
-                          UIPointerShape* proposedShape) {
+    .block = ^UIPointerStyle*(
+        UIButton* button,
+        __unused UIPointerEffect* proposedEffect,
+        __unused UIPointerShape* proposedShape) {
       UIPreviewParameters *parameters = [[UIPreviewParameters alloc] init];
       parameters.visiblePath = [UIBezierPath bezierPathWithRect:
                                 CGRectInset(button.bounds, -20, -20)];
@@ -150,6 +158,30 @@ const struct ButtonConfig configs[] = {
     stackView.translatesAutoresizingMaskIntoConstraints = false;
   }
   
+  // How to use a subview as a target
+  UIButton *custom = [UIButton buttonWithType:UIButtonTypeSystem];
+  [custom setTitle:@"Snap on image" forState:UIControlStateNormal];
+  [custom setImage:[UIImage systemImageNamed:@"pencil.tip"]
+          forState:UIControlStateNormal];
+  custom.pointerInteractionEnabled = YES;
+  custom.pointerStyleProvider = ^UIPointerStyle*(
+      UIButton* button,
+      __unused UIPointerEffect* proposedEffect,
+      __unused UIPointerShape* proposedShape) {
+    
+    UITargetedPreview* preview =
+        [[UITargetedPreview alloc] initWithView:button.imageView];
+
+    UIPointerHighlightEffect* effect =
+        [UIPointerHighlightEffect effectWithPreview:preview];
+
+    UIPointerShape *shape = starPointer(CGSizeMake(20,20));
+
+    return [UIPointerStyle styleWithEffect:effect shape:shape];
+  };
+
+  [stackView addArrangedSubview:custom];
+
   [self.view addSubview:stackView];
   
   stackView.translatesAutoresizingMaskIntoConstraints = false;
