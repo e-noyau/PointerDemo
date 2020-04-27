@@ -1,8 +1,7 @@
 #import "ViewController.h"
 
-
 static UIBezierPath *star(CGSize size) {
-  CGFloat dimension = MIN(size.width, size.height) * 2;
+  CGFloat dimension = MAX(size.width, size.height);
   CGFloat cornerRadius = dimension / 20;
   CGFloat rotation = 54;
   
@@ -58,19 +57,19 @@ const struct ButtonConfig configs[] = {
   },
   {
     .title = @"Lifted",
-    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* proposedEffect,
+    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* __,
                        UIPointerShape* proposedShape) {
-    UITargetedPreview* preview =
-        [[UITargetedPreview alloc] initWithView:button];
-    UIPointerLiftEffect* effect =
-        [UIPointerLiftEffect effectWithPreview:preview];
-    return [UIPointerStyle styleWithEffect:effect shape:proposedShape];
+      UITargetedPreview* preview =
+          [[UITargetedPreview alloc] initWithView:button];
+      UIPointerLiftEffect* effect =
+          [UIPointerLiftEffect effectWithPreview:preview];
+      return [UIPointerStyle styleWithEffect:effect shape:proposedShape];
     },
   },
   {
     .title = @"Star Shaped",
     .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* proposedEffect,
-                         UIPointerShape* proposedShape) {
+                         UIPointerShape* __) {
       CGRect rect = button.frame;
       return [UIPointerStyle
           styleWithEffect:proposedEffect
@@ -81,15 +80,40 @@ const struct ButtonConfig configs[] = {
     .title = @"Hover",
     .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* proposedEffect,
                        UIPointerShape* proposedShape) {
-    UITargetedPreview* preview =
-        [[UITargetedPreview alloc] initWithView:button];
-    UIPointerHoverEffect* effect =
-        [UIPointerHoverEffect effectWithPreview:preview];
-    return [UIPointerStyle
-        styleWithEffect:effect
-                  shape:nil];  // Not setting it to nil makes it jump around!
+      UITargetedPreview* preview =
+          [[UITargetedPreview alloc] initWithView:button];
+      UIPointerHoverEffect* effect =
+          [UIPointerHoverEffect effectWithPreview:preview];
+      return [UIPointerStyle
+          styleWithEffect:effect
+                    shape:nil];  // Not setting it to nil makes it jump around!
     },
   },
+  {
+    .title = @"Funky Hover",
+    .block = ^UIPointerStyle*(UIButton* button, UIPointerEffect* __,
+                          UIPointerShape* proposedShape) {
+      UIPreviewParameters *parameters = [[UIPreviewParameters alloc] init];
+      parameters.visiblePath = [UIBezierPath bezierPathWithRect:
+                                CGRectInset(button.bounds, -20, -20)];
+      parameters.backgroundColor = [UIColor redColor];  // No effect
+
+      UITargetedPreview* preview =
+          [[UITargetedPreview alloc] initWithView:button
+                                       parameters:parameters];
+
+      UIPointerHoverEffect* effect =
+          [UIPointerHoverEffect effectWithPreview:preview];
+      effect.preferredTintMode = UIPointerEffectTintModeNone;
+      effect.prefersShadow = YES;
+      effect.prefersScaledContent = YES;
+
+      UIPointerShape *shape = starPointer(CGSizeMake(20,20));
+
+      return [UIPointerStyle styleWithEffect:effect shape:shape];
+    },
+  },
+
 };
 
 
