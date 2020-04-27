@@ -1,11 +1,12 @@
 #import "ViewController.h"
 
 
-static UIBezierPath *star(CGFloat dimension) {
+static UIBezierPath *star(CGSize size) {
+  CGFloat dimension = MIN(size.width, size.height) * 2;
   CGFloat cornerRadius = dimension / 20;
   CGFloat rotation = 54;
   
-  CGPoint center = { dimension / 2, dimension / 2 };
+  CGPoint center = { size.width / 2, size.height / 2 };
   CGFloat radius = dimension / 2;
   CGFloat rn = radius - cornerRadius;
 
@@ -41,8 +42,8 @@ static UIBezierPath *star(CGFloat dimension) {
   return path;
 }
 
-static UIPointerShape *starPointer(CGFloat dimension) {
-  return [UIPointerShape shapeWithPath:star(dimension)];
+static UIPointerShape *starPointer(CGSize size) {
+  return [UIPointerShape shapeWithPath:star(size)];
 }
 
 struct ButtonConfig {
@@ -73,7 +74,7 @@ const struct ButtonConfig configs[] = {
       CGRect rect = button.frame;
       return [UIPointerStyle
           styleWithEffect:proposedEffect
-                    shape:starPointer(rect.size.width)];
+                    shape:starPointer(rect.size)];
     },
   },
   {
