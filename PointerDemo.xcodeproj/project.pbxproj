@@ -14,6 +14,7 @@
 		ED2AECE42453262600EE3F7D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED2AECE32453262600EE3F7D /* Assets.xcassets */; };
 		ED2AECE72453262600EE3F7D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED2AECE52453262600EE3F7D /* LaunchScreen.storyboard */; };
 		ED2AECEA2453262600EE3F7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ED2AECE92453262600EE3F7D /* main.m */; };
+		EDD00BC52460571A00CDFE1E /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDD00BC42460571A00CDFE1E /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		ED2AECE62453262600EE3F7D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED2AECE82453262600EE3F7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ED2AECE92453262600EE3F7D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		EDD00BC42460571A00CDFE1E /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				ED2AECDE2453262100EE3F7D /* ViewController.m */,
 				ED2AECE02453262100EE3F7D /* Main.storyboard */,
 				ED2AECE32453262600EE3F7D /* Assets.xcassets */,
+				EDD00BC42460571A00CDFE1E /* Colors.xcassets */,
 				ED2AECE52453262600EE3F7D /* LaunchScreen.storyboard */,
 				ED2AECE82453262600EE3F7D /* Info.plist */,
 				ED2AECE92453262600EE3F7D /* main.m */,
@@ -135,6 +138,7 @@
 			files = (
 				ED2AECE72453262600EE3F7D /* LaunchScreen.storyboard in Resources */,
 				ED2AECE42453262600EE3F7D /* Assets.xcassets in Resources */,
+				EDD00BC52460571A00CDFE1E /* Colors.xcassets in Resources */,
 				ED2AECE22453262100EE3F7D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

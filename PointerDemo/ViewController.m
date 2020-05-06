@@ -1,7 +1,7 @@
 #import "ViewController.h"
 
 static UIBezierPath *star(CGSize size) {
-  CGFloat dimension = MAX(size.width, size.height);
+  CGFloat dimension = MIN(size.width, size.height) * 1.3;
   CGFloat cornerRadius = dimension / 20;
   CGFloat rotation = 54;
   
@@ -65,7 +65,7 @@ const struct ButtonConfig configs[] = {
           [[UITargetedPreview alloc] initWithView:button];
       UIPointerLiftEffect* effect =
           [UIPointerLiftEffect effectWithPreview:preview];
-      return [UIPointerStyle styleWithEffect:effect shape:proposedShape];
+      return [UIPointerStyle styleWithEffect:effect shape:nil];
     },
   },
   {
@@ -127,18 +127,45 @@ const struct ButtonConfig configs[] = {
 
 @implementation ViewController
 
+// Returns a flat blue button with rounded corners.
++ (UIButton *)flatButton {
+  UIButton* flatButton = [UIButton buttonWithType:UIButtonTypeSystem];
+  [flatButton setTitle:@"Enable AutoFill…!"
+                       forState:UIControlStateNormal];
+  flatButton.contentEdgeInsets =
+      UIEdgeInsetsMake(17, 20, 17, 20);
+  [flatButton setBackgroundColor:[UIColor colorNamed:@"blue_color"]];
+  UIColor* titleColor = [UIColor colorNamed:@"solid_button_text_color"];
+  [flatButton setTitleColor:titleColor forState:UIControlStateNormal];
+  flatButton.titleLabel.font =
+      [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+  flatButton.layer.cornerRadius = 13;
+  flatButton.titleLabel.adjustsFontForContentSizeCategory = NO;
+  flatButton.translatesAutoresizingMaskIntoConstraints = NO;
+  flatButton.pointerInteractionEnabled = YES;
+  flatButton.pointerStyleProvider = ^UIPointerStyle*(
+      UIButton* button, UIPointerEffect* proposedEffect,
+      __unused UIPointerShape* proposedShape) {
+    return [UIPointerStyle styleWithEffect:proposedEffect shape:nil];
+  };
+  return flatButton;
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  // A big vertical stack view hold a few horizontal stack views with three
+  // buttons each, in different forms.
   UIStackView *stackView = [[UIStackView alloc] init];
   stackView.axis = UILayoutConstraintAxisVertical;
-  stackView.distribution = UIStackViewDistributionEqualSpacing;
+  stackView.distribution = UIStackViewDistributionFillEqually;
   stackView.alignment = UIStackViewAlignmentCenter;
-  stackView.spacing = 42;
+  stackView.spacing = 7;
+  [self.view addSubview:stackView];
 
   for (int ii = 0; ii < sizeof(configs) / sizeof(struct ButtonConfig); ++ii) {
     UIStackView *sub = [[UIStackView alloc] init];
-    sub.distribution = UIStackViewDistributionEqualSpacing;
+    sub.distribution = UIStackViewDistributionFillEqually;
     sub.alignment = UIStackViewAlignmentCenter;
     sub.spacing = 42;
 
@@ -149,6 +176,12 @@ const struct ButtonConfig configs[] = {
     button.pointerStyleProvider = configs[ii].block;
     [sub addArrangedSubview:button];
     
+    UIButton* primaryActionButton = [[self class] flatButton];
+    [primaryActionButton setTitle:@"Action!"
+                         forState:UIControlStateNormal];
+    primaryActionButton.pointerStyleProvider = configs[ii].block;
+    [sub addArrangedSubview:primaryActionButton];
+
     UIButton *info = [UIButton buttonWithType:UIButtonTypeInfoLight];
     info.pointerInteractionEnabled = YES;
     info.pointerStyleProvider = configs[ii].block;
@@ -156,6 +189,14 @@ const struct ButtonConfig configs[] = {
 
     [stackView addArrangedSubview:sub];
     stackView.translatesAutoresizingMaskIntoConstraints = false;
+    
+    [NSLayoutConstraint activateConstraints:@[
+      [sub.leadingAnchor
+       constraintEqualToAnchor:stackView.leadingAnchor],
+      [sub.trailingAnchor
+          constraintEqualToAnchor:stackView.trailingAnchor],
+    ]];
+
   }
   
   // How to use a subview as a target
@@ -171,24 +212,62 @@ const struct ButtonConfig configs[] = {
     
     UITargetedPreview* preview =
         [[UITargetedPreview alloc] initWithView:button.imageView];
-
     UIPointerHighlightEffect* effect =
         [UIPointerHighlightEffect effectWithPreview:preview];
-
-    UIPointerShape *shape = starPointer(CGSizeMake(20,20));
-
+    UIPointerShape *shape = starPointer(button.imageView.frame.size);
     return [UIPointerStyle styleWithEffect:effect shape:shape];
   };
 
-  [stackView addArrangedSubview:custom];
-
-  [self.view addSubview:stackView];
+  UIButton *yoloButton = [[self class] flatButton];
+  [stackView addArrangedSubview:yoloButton];
   
-  stackView.translatesAutoresizingMaskIntoConstraints = false;
-  [stackView.centerXAnchor
-      constraintEqualToAnchor:self.view.centerXAnchor].active = true;
-  [stackView.centerYAnchor
-      constraintEqualToAnchor:self.view.centerYAnchor].active = true;
+  [NSLayoutConstraint activateConstraints:@[
+    [NSLayoutConstraint constraintWithItem:yoloButton
+     attribute:NSLayoutAttributeWidth
+     relatedBy:NSLayoutRelationEqual
+        toItem:stackView
+     attribute:NSLayoutAttributeWidth
+    multiplier:.3
+      constant:0],
+    [NSLayoutConstraint constraintWithItem:yoloButton
+    attribute:NSLayoutAttributeHeight
+                  relatedBy:NSLayoutRelationEqual
+    toItem:nil
+    attribute:NSLayoutAttributeNotAnAttribute
+    multiplier:1.0
+    constant:50.0],
+  ]];
+
+  UIButton *flatButton = [[self class] flatButton];
+
+  [self.view addSubview:flatButton];
+
+  stackView.translatesAutoresizingMaskIntoConstraints = NO;
+  stackView.layoutMarginsRelativeArrangement = YES;
+  stackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 0, 10, 0);
+  [NSLayoutConstraint activateConstraints:@[
+    [stackView.leadingAnchor
+     constraintEqualToAnchor:self.view.leadingAnchor],
+    [stackView.trailingAnchor
+        constraintEqualToAnchor:self.view.trailingAnchor],
+    [stackView.bottomAnchor constraintLessThanOrEqualToAnchor:flatButton.topAnchor],
+    [stackView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+  ]];
+  
+  [NSLayoutConstraint activateConstraints:@[
+    [NSLayoutConstraint constraintWithItem:flatButton
+     attribute:NSLayoutAttributeWidth
+     relatedBy:NSLayoutRelationEqual
+        toItem:stackView
+     attribute:NSLayoutAttributeWidth
+    multiplier:.8
+      constant:0],
+    [flatButton.bottomAnchor
+    constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
+    [flatButton.centerXAnchor constraintEqualToAnchor:stackView.centerXAnchor],
+  ]];
+
+
 }
 
 
