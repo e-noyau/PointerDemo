@@ -1,137 +1,42 @@
 #import "ViewController.h"
 
-static UIBezierPath *star(CGSize size) {
-  CGFloat dimension = MIN(size.width, size.height) * 1.3;
-  CGFloat cornerRadius = dimension / 20;
-  CGFloat rotation = 54;
-  
-  CGPoint center = { size.width / 2, size.height / 2 };
-  CGFloat radius = dimension / 2;
-  CGFloat rn = radius - cornerRadius;
+#import "ExplainMeButton.h"
+#import "PointerStyle.h"
 
-  UIBezierPath *path = [[UIBezierPath alloc] init];
-  for (int i = 0; i < 5; ++i) {
-    CGPoint cc = {
-      .x = center.x + rn * cos(rotation * M_PI / 180),
-      .y = center.y + rn * sin(rotation * M_PI / 180)
-    };
+@interface ViewController ()
+// A flat blue button with rounded corners.
++ (ExplainMeButton *)flatButtonWithTitle:(NSString *)title
+                            style:(UIButtonPointerStyleProvider)provider
+                            hover:(NSString *)explain;
 
-    CGPoint p = {
-      .x = cc.x + cornerRadius * cos((rotation - 72) * M_PI / 180),
-      .y = cc.y + cornerRadius * sin((rotation - 72) * M_PI / 180)
-    };
+// A round button with a (i) image inside
++ (ExplainMeButton *)infoButtonWithStyle: (UIButtonPointerStyleProvider)provider
+hover:(NSString *)explain;
 
-    if (!i) {
-      [path moveToPoint:p];
-    } else {
-      [path addLineToPoint:p];
-    }
+// Just the text.
++ (ExplainMeButton *)buttonWithTitle:(NSString *)title
+                              style:(UIButtonPointerStyleProvider)provider
+                              hover:(NSString *)explain;
 
-    [path addArcWithCenter:cc
-                    radius:cornerRadius
-                startAngle:(rotation - 72) * M_PI / 180
-                  endAngle:(rotation + 72) * M_PI / 180
-                 clockwise:YES];
+// With an image as well.
++ (ExplainMeButton *)decoratedButtonWithTitle:(NSString *)title
+                                 style:(UIButtonPointerStyleProvider)provider
+                                 hover:(NSString *)explain;
 
-    // Repeat 5 times.
-    rotation += 144;
-  }
-  [path closePath];
++ (ExplainMeButton *)disabledButton;
 
-  return path;
-}
-
-static UIPointerShape *starPointer(CGSize size) {
-  return [UIPointerShape shapeWithPath:star(size)];
-}
-
-struct ButtonConfig {
-  NSString *title;
-  UIButtonPointerStyleProvider block;
-};
-
-const struct ButtonConfig configs[] = {
-  {
-    .title = @"Default",
-    .block = nil,
-  },
-  {
-    .title = @"Lifted",
-    .block = ^UIPointerStyle*(
-        UIButton* button,
-        __unused UIPointerEffect* proposedEffect,
-        UIPointerShape* proposedShape) {
-      UITargetedPreview* preview =
-          [[UITargetedPreview alloc] initWithView:button];
-      UIPointerLiftEffect* effect =
-          [UIPointerLiftEffect effectWithPreview:preview];
-      return [UIPointerStyle styleWithEffect:effect shape:nil];
-    },
-  },
-  {
-    .title = @"Star Shaped",
-    .block = ^UIPointerStyle*(
-        UIButton* button,
-        UIPointerEffect* proposedEffect,
-        __unused UIPointerShape* proposedShape) {
-      CGRect rect = button.frame;
-      return [UIPointerStyle
-          styleWithEffect:proposedEffect
-                    shape:starPointer(rect.size)];
-    },
-  },
-  {
-    .title = @"Hover",
-    .block = ^UIPointerStyle*(
-        UIButton* button,
-        __unused UIPointerEffect* proposedEffect,
-        __unused UIPointerShape* proposedShape) {
-      UITargetedPreview* preview =
-          [[UITargetedPreview alloc] initWithView:button];
-      UIPointerHoverEffect* effect =
-          [UIPointerHoverEffect effectWithPreview:preview];
-      return [UIPointerStyle
-          styleWithEffect:effect
-                    shape:nil];  // Not setting it to nil makes it jump around!
-    },
-  },
-  {
-    .title = @"Funky Hover",
-    .block = ^UIPointerStyle*(
-        UIButton* button,
-        __unused UIPointerEffect* proposedEffect,
-        __unused UIPointerShape* proposedShape) {
-      UIPreviewParameters *parameters = [[UIPreviewParameters alloc] init];
-      parameters.visiblePath = [UIBezierPath bezierPathWithRect:
-                                CGRectInset(button.bounds, -20, -20)];
-      parameters.backgroundColor = [UIColor redColor];  // No effect
-
-      UITargetedPreview* preview =
-          [[UITargetedPreview alloc] initWithView:button
-                                       parameters:parameters];
-
-      UIPointerHoverEffect* effect =
-          [UIPointerHoverEffect effectWithPreview:preview];
-      effect.preferredTintMode = UIPointerEffectTintModeNone;
-      effect.prefersShadow = YES;
-      effect.prefersScaledContent = YES;
-
-      UIPointerShape *shape = starPointer(CGSizeMake(20,20));
-
-      return [UIPointerStyle styleWithEffect:effect shape:shape];
-    },
-  },
-
-};
+@end
 
 
 @implementation ViewController
 
 // Returns a flat blue button with rounded corners.
-+ (UIButton *)flatButton {
-  UIButton* flatButton = [UIButton buttonWithType:UIButtonTypeSystem];
-  [flatButton setTitle:@"Enable AutoFill…!"
-                       forState:UIControlStateNormal];
++ (ExplainMeButton *)flatButtonWithTitle:(NSString *)title
+                            style:(UIButtonPointerStyleProvider)provider
+                            hover:(NSString *)explain {
+  ExplainMeButton* flatButton = [ExplainMeButton buttonWithType:UIButtonTypeSystem];
+  [flatButton setTitle:title forState:UIControlStateNormal];
+  flatButton.explain = explain;
   flatButton.contentEdgeInsets =
       UIEdgeInsetsMake(17, 20, 17, 20);
   [flatButton setBackgroundColor:[UIColor colorNamed:@"blue_color"]];
@@ -143,52 +48,198 @@ const struct ButtonConfig configs[] = {
   flatButton.titleLabel.adjustsFontForContentSizeCategory = NO;
   flatButton.translatesAutoresizingMaskIntoConstraints = NO;
   flatButton.pointerInteractionEnabled = YES;
-  flatButton.pointerStyleProvider = ^UIPointerStyle*(
-      UIButton* button, UIPointerEffect* proposedEffect,
-      __unused UIPointerShape* proposedShape) {
-    return [UIPointerStyle styleWithEffect:proposedEffect shape:nil];
-  };
+  if (provider)
+    flatButton.pointerStyleProvider = provider;
   return flatButton;
+}
+
++ (ExplainMeButton *)infoButtonWithStyle:(UIButtonPointerStyleProvider)provider
+hover:(NSString *)explain {
+  ExplainMeButton *info = [ExplainMeButton buttonWithType:UIButtonTypeInfoLight];
+  info.explain = explain;
+  info.pointerInteractionEnabled = YES;
+  if (provider)
+    info.pointerStyleProvider = provider;
+  return info;
+}
+
++ (ExplainMeButton *)buttonWithTitle:(NSString *)title
+                        style:(UIButtonPointerStyleProvider)provider
+                        hover:(NSString *)explain {
+  ExplainMeButton *button = [ExplainMeButton buttonWithType:UIButtonTypeSystem];
+  [button setTitle:title forState:UIControlStateNormal];
+  button.explain = explain;
+  button.contentEdgeInsets = UIEdgeInsetsMake(4, 4, 4, 4);
+  button.pointerInteractionEnabled = YES;
+  if (provider)
+    button.pointerStyleProvider = provider;
+  return button;
+}
+
++ (ExplainMeButton *)decoratedButtonWithTitle:(NSString *)title
+                                 style:(UIButtonPointerStyleProvider)provider
+                                 hover:(NSString *)explain {
+  ExplainMeButton *custom = [ExplainMeButton buttonWithType:UIButtonTypeSystem];
+  [custom setTitle:title forState:UIControlStateNormal];
+  [custom setImage:[UIImage systemImageNamed:@"pencil.tip"]
+          forState:UIControlStateNormal];
+  custom.explain = explain;
+  custom.pointerInteractionEnabled = YES;
+  custom.pointerStyleProvider = provider;
+  return custom;
+}
+
++ (ExplainMeButton *)disabledButton {
+  ExplainMeButton *button = [ExplainMeButton buttonWithType:UIButtonTypeSystem];
+  [button setTitle:@""
+          forState:UIControlStateNormal];
+  button.explain = @"";
+  button.contentEdgeInsets = UIEdgeInsetsMake(4, 4, 4, 4);
+  button.pointerInteractionEnabled = YES;
+  button.enabled = NO;
+  return button;
+
+}
+
++ (NSArray<NSArray<ExplainMeButton*>*>*)model {
+  NSString *wowString =
+    @"These three 'Wow!' buttons are all identical. The exact same code "
+    @"creates them, the only difference is their width. And the pointer effect "
+    @"is affected by the size. The top button on an iPad in portrait mode is "
+    @"the intended effect. The hover is not what is intended.";
+
+  return @[
+    @[
+      [self buttonWithTitle:@"Default"
+                      style:nil
+                      hover:
+       @"Simple default effect of a highlight with a rounded rect around the "
+       @"label, ideal for buttons with no background."],
+      [self flatButtonWithTitle:@"Default"
+                          style:nil
+                          hover:
+       @"If a background color is present, the highlight loses its rounded "
+       @"rect and gets a square, still only around the label."],
+      [self infoButtonWithStyle:nil hover:
+       @"This 'typeinfolight' button is getting a circular hover, but the "
+       @"circular gray highlight is calculated based on the width…"],
+    ],
+    @[
+      [self buttonWithTitle:@"Star Shape"
+                      style:StyleStarShape()
+                      hover:
+       @"This effect keeps the default effect and only replaces the shape by a "
+       @"star. this one is the default highlight, with the button morphing "
+       @"into a star."],
+      [self flatButtonWithTitle:@"Starry!" style:StyleStarShape() hover:
+       @"Same here, reshaping the highlight as a star."],
+      [self infoButtonWithStyle:StyleStarShape() hover:
+       @"Using the right sized shape makes this more interesting to look at."],
+    ],
+    @[
+      [self buttonWithTitle:@"Lifted Default Shape"
+                      style:StyleLiftedDefaultShape()
+                      hover:
+       @"The somewhat expected effect, with the button lifting and a shadow."],
+      [self flatButtonWithTitle:@"Failed lift!"
+                          style:StyleLiftedDefaultShape()
+                          hover:
+       @"Here the lift failed, and the button is doing a highlight instead."],
+      [self infoButtonWithStyle:StyleLiftedDefaultShape()
+                          hover:
+       @"This button doesn't like the lift, and does an unexpected hover "
+       @"instead."],
+    ],
+    @[
+      [self buttonWithTitle:@"Lifted Rounded Shape"
+                      style:StyleLiftedRoundedShape(RectSourceButton)
+                      hover:
+       @"Not really a difference with the previous one."],
+      [self flatButtonWithTitle:@"Buggy!"
+                          style:StyleLiftedRoundedShape(RectSourceButton)
+                          hover:
+       @"Here we hit an issue. The desired lift is not happening, and it "
+       @"is replaced by a hover, lifting the button, but keeping the pointer "
+       @"alive."],
+      [self infoButtonWithStyle:StyleLiftedRoundedShape(RectSourceButtonCircle)
+                          hover:
+       @"Finally, a proper lift. As this button is not square the shaping of "
+       @"the pointer need to be done via code."],
+    ],
+    @[
+      [self buttonWithTitle:@"Hover" style:StyleHover() hover:
+       @"What is more boring than a hover? Another hover…"],
+      [self flatButtonWithTitle:@"boring" style:StyleHover() hover:
+       @"What is more boring than a hover? Another hover…"],
+      [self infoButtonWithStyle:StyleHover() hover:
+       @"What is more boring than a hover? Another hover…"],
+    ],
+    @[ [[self class] disabledButton] ],
+    @[
+        [self decoratedButtonWithTitle:@"Snap to image"
+                                 style:StyleHighlightImageOnly()
+                                 hover:
+         @"A little jarring, jumping away from where you are to there and "
+         @"back again."],
+    ],
+    @[ [[self class] disabledButton], ],
+    @[
+      [[self class] disabledButton],
+      [[self class] disabledButton],
+      [self flatButtonWithTitle:@"Wow!"
+                          style:StyleLiftedRoundedShape(RectSourceButton)
+                          hover:wowString],
+      [[self class] disabledButton],
+      [[self class] disabledButton],
+    ],
+    @[
+      [[self class] disabledButton],
+      [self flatButtonWithTitle:@"Wow!"
+                          style:StyleLiftedRoundedShape(RectSourceButton)
+                          hover:wowString],
+      [self flatButtonWithTitle:@"Wow!"
+                          style:StyleLiftedRoundedShape(RectSourceButton)
+                          hover:wowString],
+      [[self class] disabledButton],
+    ],
+  ];
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  
   // A big vertical stack view hold a few horizontal stack views with three
   // buttons each, in different forms.
   UIStackView *stackView = [[UIStackView alloc] init];
+  stackView.translatesAutoresizingMaskIntoConstraints = NO;
   stackView.axis = UILayoutConstraintAxisVertical;
-  stackView.distribution = UIStackViewDistributionFillEqually;
   stackView.alignment = UIStackViewAlignmentCenter;
-  stackView.spacing = 7;
-  [self.view addSubview:stackView];
+  stackView.spacing = 20;
+  stackView.layoutMarginsRelativeArrangement = YES;
+  stackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 0, 10, 0);
 
-  for (int ii = 0; ii < sizeof(configs) / sizeof(struct ButtonConfig); ++ii) {
+  [self.view addSubview:stackView];
+  
+  UILabel *label = [[UILabel alloc] init];
+  label.text = @"placeholder";
+  label.numberOfLines = 0;
+  label.lineBreakMode = NSLineBreakByWordWrapping;
+  label.textAlignment = NSTextAlignmentCenter;
+  [stackView addArrangedSubview:label];
+
+  for (NSArray<ExplainMeButton *> *buttons in [[self class] model]) {
     UIStackView *sub = [[UIStackView alloc] init];
+    sub.translatesAutoresizingMaskIntoConstraints = NO;
     sub.distribution = UIStackViewDistributionFillEqually;
     sub.alignment = UIStackViewAlignmentCenter;
     sub.spacing = 42;
 
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    [button setTitle:configs[ii].title forState:UIControlStateNormal];
-    button.contentEdgeInsets = UIEdgeInsetsMake(4, 4, 4, 4);
-    button.pointerInteractionEnabled = YES;
-    button.pointerStyleProvider = configs[ii].block;
-    [sub addArrangedSubview:button];
-    
-    UIButton* primaryActionButton = [[self class] flatButton];
-    [primaryActionButton setTitle:@"Action!"
-                         forState:UIControlStateNormal];
-    primaryActionButton.pointerStyleProvider = configs[ii].block;
-    [sub addArrangedSubview:primaryActionButton];
-
-    UIButton *info = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    info.pointerInteractionEnabled = YES;
-    info.pointerStyleProvider = configs[ii].block;
-    [sub addArrangedSubview:info];
-
+    for (ExplainMeButton *button in buttons) {
+      button.explainTarget = label;
+      [sub addArrangedSubview:button];
+    }
     [stackView addArrangedSubview:sub];
-    stackView.translatesAutoresizingMaskIntoConstraints = false;
     
     [NSLayoutConstraint activateConstraints:@[
       [sub.leadingAnchor
@@ -196,78 +247,24 @@ const struct ButtonConfig configs[] = {
       [sub.trailingAnchor
           constraintEqualToAnchor:stackView.trailingAnchor],
     ]];
-
   }
   
-  // How to use a subview as a target
-  UIButton *custom = [UIButton buttonWithType:UIButtonTypeSystem];
-  [custom setTitle:@"Snap on image" forState:UIControlStateNormal];
-  [custom setImage:[UIImage systemImageNamed:@"pencil.tip"]
-          forState:UIControlStateNormal];
-  custom.pointerInteractionEnabled = YES;
-  custom.pointerStyleProvider = ^UIPointerStyle*(
-      UIButton* button,
-      __unused UIPointerEffect* proposedEffect,
-      __unused UIPointerShape* proposedShape) {
-    
-    UITargetedPreview* preview =
-        [[UITargetedPreview alloc] initWithView:button.imageView];
-    UIPointerHighlightEffect* effect =
-        [UIPointerHighlightEffect effectWithPreview:preview];
-    UIPointerShape *shape = starPointer(button.imageView.frame.size);
-    return [UIPointerStyle styleWithEffect:effect shape:shape];
-  };
-
-  UIButton *yoloButton = [[self class] flatButton];
-  [stackView addArrangedSubview:yoloButton];
-  
-  [NSLayoutConstraint activateConstraints:@[
-    [NSLayoutConstraint constraintWithItem:yoloButton
-     attribute:NSLayoutAttributeWidth
-     relatedBy:NSLayoutRelationEqual
-        toItem:stackView
-     attribute:NSLayoutAttributeWidth
-    multiplier:.3
-      constant:0],
-    [NSLayoutConstraint constraintWithItem:yoloButton
-    attribute:NSLayoutAttributeHeight
-                  relatedBy:NSLayoutRelationEqual
-    toItem:nil
-    attribute:NSLayoutAttributeNotAnAttribute
-    multiplier:1.0
-    constant:50.0],
-  ]];
-
-  UIButton *flatButton = [[self class] flatButton];
-
-  [self.view addSubview:flatButton];
-
-  stackView.translatesAutoresizingMaskIntoConstraints = NO;
-  stackView.layoutMarginsRelativeArrangement = YES;
-  stackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 0, 10, 0);
   [NSLayoutConstraint activateConstraints:@[
     [stackView.leadingAnchor
      constraintEqualToAnchor:self.view.leadingAnchor],
     [stackView.trailingAnchor
         constraintEqualToAnchor:self.view.trailingAnchor],
-    [stackView.bottomAnchor constraintLessThanOrEqualToAnchor:flatButton.topAnchor],
+    [stackView.bottomAnchor constraintLessThanOrEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
     [stackView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
-  ]];
   
-  [NSLayoutConstraint activateConstraints:@[
-    [NSLayoutConstraint constraintWithItem:flatButton
-     attribute:NSLayoutAttributeWidth
-     relatedBy:NSLayoutRelationEqual
-        toItem:stackView
-     attribute:NSLayoutAttributeWidth
-    multiplier:.8
-      constant:0],
-    [flatButton.bottomAnchor
-    constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
-    [flatButton.centerXAnchor constraintEqualToAnchor:stackView.centerXAnchor],
+    [NSLayoutConstraint constraintWithItem:label
+                                 attribute:NSLayoutAttributeHeight
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:self.view
+                                 attribute:NSLayoutAttributeHeight
+                                multiplier:.15
+                                  constant:0],
   ]];
-
-
 }
 
 

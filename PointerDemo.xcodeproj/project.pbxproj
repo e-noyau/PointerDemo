@@ -15,6 +15,9 @@
 		ED2AECE72453262600EE3F7D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED2AECE52453262600EE3F7D /* LaunchScreen.storyboard */; };
 		ED2AECEA2453262600EE3F7D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ED2AECE92453262600EE3F7D /* main.m */; };
 		EDD00BC52460571A00CDFE1E /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDD00BC42460571A00CDFE1E /* Colors.xcassets */; };
+		EDD00BC8246413AD00CDFE1E /* StarPath.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD00BC7246413AD00CDFE1E /* StarPath.m */; };
+		EDD00BCD246417EB00CDFE1E /* PointerStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD00BCC246417EB00CDFE1E /* PointerStyle.m */; };
+		EDD00BD0246432DF00CDFE1E /* ExplainMeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD00BCF246432DF00CDFE1E /* ExplainMeButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +34,12 @@
 		ED2AECE82453262600EE3F7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ED2AECE92453262600EE3F7D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EDD00BC42460571A00CDFE1E /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		EDD00BC6246413AD00CDFE1E /* StarPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StarPath.h; sourceTree = "<group>"; };
+		EDD00BC7246413AD00CDFE1E /* StarPath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StarPath.m; sourceTree = "<group>"; };
+		EDD00BCB246417EB00CDFE1E /* PointerStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PointerStyle.h; sourceTree = "<group>"; };
+		EDD00BCC246417EB00CDFE1E /* PointerStyle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PointerStyle.m; sourceTree = "<group>"; };
+		EDD00BCE246432DF00CDFE1E /* ExplainMeButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExplainMeButton.h; sourceTree = "<group>"; };
+		EDD00BCF246432DF00CDFE1E /* ExplainMeButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExplainMeButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +78,12 @@
 				ED2AECDB2453262100EE3F7D /* SceneDelegate.m */,
 				ED2AECDD2453262100EE3F7D /* ViewController.h */,
 				ED2AECDE2453262100EE3F7D /* ViewController.m */,
+				EDD00BC6246413AD00CDFE1E /* StarPath.h */,
+				EDD00BC7246413AD00CDFE1E /* StarPath.m */,
+				EDD00BCE246432DF00CDFE1E /* ExplainMeButton.h */,
+				EDD00BCF246432DF00CDFE1E /* ExplainMeButton.m */,
+				EDD00BCB246417EB00CDFE1E /* PointerStyle.h */,
+				EDD00BCC246417EB00CDFE1E /* PointerStyle.m */,
 				ED2AECE02453262100EE3F7D /* Main.storyboard */,
 				ED2AECE32453262600EE3F7D /* Assets.xcassets */,
 				EDD00BC42460571A00CDFE1E /* Colors.xcassets */,
@@ -153,7 +168,10 @@
 				ED2AECDF2453262100EE3F7D /* ViewController.m in Sources */,
 				ED2AECD92453262100EE3F7D /* AppDelegate.m in Sources */,
 				ED2AECEA2453262600EE3F7D /* main.m in Sources */,
+				EDD00BD0246432DF00CDFE1E /* ExplainMeButton.m in Sources */,
+				EDD00BC8246413AD00CDFE1E /* StarPath.m in Sources */,
 				ED2AECDC2453262100EE3F7D /* SceneDelegate.m in Sources */,
+				EDD00BCD246417EB00CDFE1E /* PointerStyle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
